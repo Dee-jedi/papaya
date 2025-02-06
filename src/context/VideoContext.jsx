@@ -8,13 +8,13 @@ export const VideoProvider = ({ children }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
 
-  // Debounce effect: Update debouncedSearchTerm after 500ms of inactivity
+  // Increase debounce time to 2 seconds to reduce API calls
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 500);
+    }, 1000); // Increased from 500ms to 2000ms
 
-    return () => clearTimeout(handler); // Cleanup previous timeout
+    return () => clearTimeout(handler);
   }, [searchTerm]);
 
   // Function to handle category selection
@@ -22,13 +22,22 @@ export const VideoProvider = ({ children }) => {
     setSelectedCategory(category);
   };
 
-  // Fetch videos from API based on debouncedSearchTerm or selectedCategory
   useEffect(() => {
+    // Fetch videos from API based on debouncedSearchTerm or selectedCategory
     const fetchVideos = async () => {
-      const API_KEY = 'AIzaSyBsM9j2Zi9bwlZ8spk1p-of9z6SrW7ivSE';
+      const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
       const query =
         debouncedSearchTerm.trim() ||
         (selectedCategory === 'All' ? 'educational videos' : selectedCategory);
+
+      // Check local storage first
+      const cacheKey = `videos_${query}`;
+      const cachedData = localStorage.getItem(cacheKey);
+      if (cachedData) {
+        setVideos(JSON.parse(cachedData));
+        return; // Prevent unnecessary API calls
+      }
+
       const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${query}&type=video&key=${API_KEY}`;
 
       try {
@@ -51,7 +60,9 @@ export const VideoProvider = ({ children }) => {
               ).toDateString()}`,
               thumbnail: item.snippet.thumbnails.high.url,
             }));
+
           setVideos(videoItems);
+          localStorage.setItem(cacheKey, JSON.stringify(videoItems)); // Store in cache
         } else {
           console.warn('No videos found in API response');
           setVideos([]);
@@ -60,7 +71,6 @@ export const VideoProvider = ({ children }) => {
         console.error('Error fetching videos:', error);
       }
     };
-
     fetchVideos();
   }, [debouncedSearchTerm, selectedCategory]);
 

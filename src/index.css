@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body { @apply bg-gradient-to-b from-[#2b2f53] to-[#1d1c34] text-gray-300 min-h-screen overflow-hidden m-0 font-sans
+}
+
+/* styles.css or tailwind.css */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Beautifying the scrollbar for webkit browsers (Chrome, Safari) */  
+::-webkit-scrollbar {  
+  width: 8px; /* Width of scrollbar */  
+}  
+
+::-webkit-scrollbar-track {  
+  background: transparent; /* Background of the track */  
+}  
+
+::-webkit-scrollbar-thumb {  
+  background: #aaa; /* Color of the scrollbar thumb */  
+  border-radius: 10px; /* Round edges */  
+}  
+
+/* Hide the scrollbar when not hovering */  
+.container {  
+  overflow-y: hidden; /* Hide scrollbar by default */  
+}  
+
+/* Show scrollbar on hover */  
+.container:hover {  
+  overflow-y: auto; /* Show scrollbar only on hover */  
+}
